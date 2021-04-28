@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using jwtapi_app.Models;
 
 namespace jwtapi_app
 {
@@ -10,10 +11,18 @@ namespace jwtapi_app
         static async Task Main(string[] args)
         {
             const string url = "http://localhost:5000/";
-            if (!TokenUtils.IsTokenValid())
+            const string username = "rai";
+            const string password = "password";
+            switch (TokenUtils.IsTokenValid())
             {
-                Console.WriteLine("Missing valid token! Retrieving new token...");
-                await TokenUtils.GetToken();
+                case 1:
+                    Console.WriteLine("Refreshing token...");
+                    await TokenUtils.RefreshToken(url);
+                    break;
+                case 2:
+                    Console.WriteLine("Getting new token...");
+                    await TokenUtils.GetToken(username, password, url);
+                    break;
             }
 
             var tokenDetails = await TokenUtils.GetTokenDetails();
