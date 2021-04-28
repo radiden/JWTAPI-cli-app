@@ -28,38 +28,28 @@ namespace jwtapi_app
                 Console.WriteLine("Invalid JSON in token! Recreating...");
                 return false;
             }
-
-            if (DateTime.Compare(deserializedToken.TokenExpirationDate, DateTime.Now) < 0)
-            {
-                return false;
-            }
-
-            return true;
+            
+            return deserializedToken.TokenExpirationDate >= DateTime.UtcNow;
         }
         /// <summary>True if token was successfully retrieved</summary>
-        public async static Task<bool> GetToken()
+        public static async Task<bool> GetToken()
         {
             if (File.Exists("token.json"))
             {
                 File.Delete("token.json");
             }
 
-            using (var file = File.Open("token.json", FileMode.Create))
-            {
-                using (var client = new HttpClient())
-                {
-                    var fileBuf = await client.GetByteArrayAsync("http://localhost:5000/Authorization/GetToken");
-                    file.Write(fileBuf);
-                }
-            }
+            await using var file = File.Open("token.json", FileMode.Create);
+            using var client = new HttpClient();
+            var fileBuf = await client.GetByteArrayAsync("http://localhost:5000/Authorization/GetToken");
+            file.Write(fileBuf);
+
             return true;
         }
-        public async static Task<TokenDetails> GetTokenDetails()
+        public static async Task<TokenDetails> GetTokenDetails()
         {
-            using (var stream = File.OpenRead("token.json"))
-            {
-                return await JsonSerializer.DeserializeAsync<TokenDetails>(stream);           
-            }
+            using FileStream stream = File.OpenRead("token.json");
+            return await JsonSerializer.DeserializeAsync<TokenDetails>(stream);
         }
     }
 }
