@@ -64,7 +64,7 @@ namespace jwtapi_app
             await using var file = File.Open("token.json", FileMode.Create);
             using var client = new HttpClient();
 
-            var postData = new UserModel
+            var postData = new User
             {
                 Username = username,
                 Password = password
