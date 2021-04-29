@@ -48,7 +48,7 @@ namespace jwtapi_app
 
             var response = await client.PostAsJsonAsync(url + "Authorization/RefreshToken", serializedToken);
 
-            file.Seek(0, SeekOrigin.Begin);
+            file.SetLength(0);
             
             await response.Content.CopyToAsync(file);
             return true;
